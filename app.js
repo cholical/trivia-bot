@@ -20,11 +20,13 @@ var connector = new builder.ChatConnector({
 server.post('/api/messages', connector.listen());
 
 var tableName = 'botdata';
+var tableStorage;
 var azureTableClient = new botbuilder_azure.AzureTableClient(tableName, process.env['AzureWebJobsStorage']);
-//Comment the line below when running locally. Uncomment the line below when publishing to Azure
-// var tableStorage = new botbuilder_azure.AzureBotStorage({ gzipData: false }, azureTableClient);
-//Comment the line below when publishing to Azure. Uncomment the line below when running locally.
-var tableStorage = new builder.MemoryBotStorage();
+if (process.env.BotEnv == 'prod') {
+    tableStorage = new botbuilder_azure.AzureBotStorage({ gzipData: false }, azureTableClient);
+} else {
+    tableStorage = new builder.MemoryBotStorage();
+}
 
 // Create your bot with a function to receive messages from the user
 var bot = new builder.UniversalBot(connector);
@@ -73,7 +75,7 @@ bot.dialog('question', [
             session.conversationData.correctAnswer = parsedBody.results[0].correct_answer;
             item.answers = parsedBody.results[0].incorrect_answers;
             item.answers.splice(Math.floor(Math.random() * 3), 0, session.conversationData.correctAnswer);
-            builder.Prompts.choice(session, `Question #${session.conversationData.questionCount}: ${item.question}`, item.answers);
+            builder.Prompts.choice(session, `Question #${session.conversationData.questionCount}: ${item.question}`, item.answers, {listStyle: builder.ListStyle.button});
             session.conversationData.questionCount++;
         });
     },
