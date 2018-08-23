@@ -33,7 +33,7 @@ var bot = new builder.UniversalBot(connector);
 bot.set('storage', tableStorage);
 
 var triviaOptions = {
-    url: 'https://opentdb.com/api.php?amount=1&difficulty=hard&type=multiple',
+    url: 'https://opentdb.com/api.php?amount=1&category=9&type=multiple',
     headers: {
         'Content-Type': 'application/json'
     }
