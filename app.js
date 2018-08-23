@@ -1,7 +1,3 @@
-/*-----------------------------------------------------------------------------
-A simple echo bot for the Microsoft Bot Framework. 
------------------------------------------------------------------------------*/
-
 var restify = require('restify');
 var builder = require('botbuilder');
 var botbuilder_azure = require("botbuilder-azure");
@@ -23,40 +19,16 @@ var connector = new builder.ChatConnector({
 // Listen for messages from users 
 server.post('/api/messages', connector.listen());
 
-/*----------------------------------------------------------------------------------------
-* Bot Storage: This is a great spot to register the private state storage for your bot. 
-* We provide adapters for Azure Table, CosmosDb, SQL Azure, or you can implement your own!
-* For samples and documentation, see: https://github.com/Microsoft/BotBuilder-Azure
-* ---------------------------------------------------------------------------------------- */
-
 var tableName = 'botdata';
 var azureTableClient = new botbuilder_azure.AzureTableClient(tableName, process.env['AzureWebJobsStorage']);
+//Comment the line below when running locally. Uncomment the line below when publishing to Azure
 // var tableStorage = new botbuilder_azure.AzureBotStorage({ gzipData: false }, azureTableClient);
+//Comment the line below when publishing to Azure. Uncomment the line below when running locally.
 var tableStorage = new builder.MemoryBotStorage();
 
 // Create your bot with a function to receive messages from the user
 var bot = new builder.UniversalBot(connector);
 bot.set('storage', tableStorage);
-
-// bot.dialog('/', [
-//     function (session) {
-//         builder.Prompts.text(session, "Hello... What's your name?");
-//     },
-//     function (session, results) {
-//         session.userData.name = results.response;
-//         builder.Prompts.number(session, "Hi " + results.response + ", How many years have you been coding?"); 
-//     },
-//     function (session, results) {
-//         session.userData.coding = results.response;
-//         builder.Prompts.choice(session, "What language do you code Node using?", ["JavaScript", "CoffeeScript", "TypeScript"]);
-//     },
-//     function (session, results) {
-//         session.userData.language = results.response.entity;
-//         session.send("Got it... " + session.userData.name + 
-//                     " you've been programming for " + session.userData.coding + 
-//                     " years and use " + session.userData.language + ".");
-//     }
-// ]);
 
 var triviaOptions = {
     url: 'https://opentdb.com/api.php?amount=1&difficulty=hard&type=multiple',
@@ -68,7 +40,9 @@ var triviaOptions = {
 bot.dialog('/', [
     function (session) {
         session.conversationData.questionCount = 1;
+        session.conversationData.correctCount = 0;
         session.send('Welcome to Bot Trivia!');
+        session.send('Enter /end to end the game at any time.');
         session.beginDialog('questionContainer');
     }
 ]);
@@ -80,12 +54,16 @@ bot.dialog('questionContainer', [
         var answer = results.response.entity;
         if (answer == session.conversationData.correctAnswer) {
             session.send('That\'s correct!');
+            session.conversationData.correctCount++;
         } else {
-            session.send(`That\'s not correct! The correct answer was ${session.conversationData.correctAnswer}`);
+            session.send(`That\'s incorrect! The correct answer was ${session.conversationData.correctAnswer}.`);
         }
+        session.send(`Score: ${session.conversationData.correctCount} / ${session.conversationData.questionCount - 1}`);
         session.replaceDialog('questionContainer');
     }
-]);
+]).endConversationAction('endConversationAction', 'Thank you for playing Bot Trivia!', {
+    matches: /^\/end$/i
+});
 bot.dialog('question', [
     function (session) {
         var item = {};
@@ -95,22 +73,13 @@ bot.dialog('question', [
             session.conversationData.correctAnswer = parsedBody.results[0].correct_answer;
             item.answers = parsedBody.results[0].incorrect_answers;
             item.answers.splice(Math.floor(Math.random() * 3), 0, session.conversationData.correctAnswer);
-            session.send(`Question #${session.conversationData.questionCount}:`);
+            builder.Prompts.choice(session, `Question #${session.conversationData.questionCount}: ${item.question}`, item.answers);
             session.conversationData.questionCount++;
-            builder.Prompts.choice(session, item.question, item.answers);
         });
     },
     function (session, results) {
         session.endDialogWithResult(results);
     }
-]);
-
-bot.on('conversationUpdate', function (message) {
-    if (message.membersAdded) {
-        message.membersAdded.forEach(function (identity) {
-            if (identity.id === message.address.bot.id) {
-                bot.beginDialog(message.address, '/');
-            }
-        });
-    }
+]).endConversationAction('endConversationAction', 'Thank you for playing Bot Trivia!', {
+    matches: /^\/end$/i
 });
