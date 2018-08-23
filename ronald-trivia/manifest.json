@@ -1,0 +1,93 @@
+{
+  "$schema": " https://developer.microsoft.com/en-us/json-schemas/teams/v1.3/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.0",
+  "version": "1.0.0",
+  "id": "78bc95c8-e867-477f-a010-c476fc025b12",
+  "packageName": "Bot Trivia",
+  "developer": {
+    "name": "Ronald",
+    "websiteUrl": "https://website.com/",
+    "privacyUrl": "https://website.com/privacy",
+    "termsOfUseUrl": "https://website.com/app-tos"
+  },
+  "name": {
+    "short": "Bot Trivia by Ronald Ding",
+    "full": "Bot Trivia by Ronald Ding"
+  },
+  "description": {
+    "short": "A simple trivia bot that can be integrated with Teams.",
+    "full": "A simple trivia bot that can be integrated with Teams. Built using NodeJS and the Bot Framework. If the bot no longer works, it probably means I took the Bot Service down from Azure to save credits."
+  },
+  "icons": {
+    "outline": "outline.png", 
+    "color": "color.png" 
+  },
+  "accentColor": "#0ba9ce",
+  "configurableTabs": [
+    {
+      "configurationUrl": "https://contoso.com/teamstab/configure",
+      "canUpdateConfiguration": true,
+      "scopes": [ "team", "groupchat" ]
+    }
+  ],
+  "staticTabs": [
+    {
+      "entityId": "idForPage",
+      "name": "Display name of tab",
+      "contentUrl": "https://contoso.com/content?host=msteams",
+      "websiteUrl": "https://contoso.com/content",
+      "scopes": [ "personal" ]
+    }
+  ],
+  "bots": [
+    {
+      "botId": "78bc95c8-e867-477f-a010-c476fc025b12",
+      "needsChannelSelector": false,
+      "isNotificationOnly": false,
+      "scopes": [ "team", "personal", "groupchat" ],
+      "supportsFiles": true,
+      "commandLists": [
+        {
+          "scopes": [ "team", "groupchat" ],
+          "commands": [
+            {
+              "title": "Command 1",
+              "description": "Description of Command 1"
+            },
+            {
+              "title": "Command N",
+              "description": "Description of Command N"
+            }
+          ]
+        },
+        {
+          "scopes": [ "personal" ],
+          "commands": [
+          ]
+        }
+      ]
+    }
+  ],
+  "connectors": [
+    {
+      "connectorId": "GUID-FROM-CONNECTOR-DEV-PORTAL%",
+      "configurationUrl": "https://contoso.com/teamsconnector/configure",
+      "scopes": [ "team"]
+    }
+  ],
+  "composeExtensions": [
+    {
+      "botId": "78bc95c8-e867-477f-a010-c476fc025b12",
+      "canUpdateConfiguration": true,
+      "commands": [
+      ]
+    }
+  ],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": [
+     "contoso.com"
+  ]
+}
