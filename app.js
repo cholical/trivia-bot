@@ -64,7 +64,7 @@ bot.dialog('questionContainer', [
         session.replaceDialog('questionContainer');
     }
 ]).endConversationAction('endConversationAction', 'Thank you for playing Bot Trivia!', {
-    matches: /^\/end$/i
+    matches: /\/end$/i
 });
 bot.dialog('question', [
     function (session) {
@@ -83,5 +83,5 @@ bot.dialog('question', [
         session.endDialogWithResult(results);
     }
 ]).endConversationAction('endConversationAction', 'Thank you for playing Bot Trivia!', {
-    matches: /^\/end$/i
+    matches: /\/end$/i
 });
